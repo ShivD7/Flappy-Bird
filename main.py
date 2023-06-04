@@ -20,19 +20,19 @@ main_character = pygame.transform.scale(main_character, [150, 175])
 background = pygame.image.load("background.jpg")
 background = pygame.transform.scale(background, [400, 600])
 
+intro_text = pygame.image.load("Screen Shot 2023-06-04 at 11.02.54 AM.png")
+
+
 def starting_screen():
     main_characterx = 120
     main_charactery = 280
     screen.fill(WHITE)
     font = pygame.font.Font("FlappybirdyRegular-KaBW.ttf", 100)
-    intro_text = font.render("Flappy Joyride", True, BLACK)
-    intro_text2 = font.render("Click to play", True, BLACK)
     screen.blit(intro_text, [25, 200])
     screen.blit(main_character, [main_characterx, main_charactery])
     main_charactery -= 2
     time.sleep(60)
     main_charactery += 2
-    screen.blit(intro_text2, [35, 480])
     pygame.display.flip()
 
 def playing_screen():
