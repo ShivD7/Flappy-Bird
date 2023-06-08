@@ -1,106 +1,112 @@
+#import all needed modules
 import pygame
 import random
 import time
-pygame.init()
-size = (400, 600)
-screen = pygame.display.set_mode(size)
+pygame.init()#initilize pygaame module to make use of it
+size = (400, 600) #create the screen size
+screen = pygame.display.set_mode(size)#create screen
 
-game_state = "intro"
+game_state = "intro" #create a variable to track the different screens. Starts at intro as this is where the user deteremines if they want to play
 
-collided = False
-drawing_poles = False
+collided = False #create variable to track if the player has collided with poles. Helps with understanding when we should switch to ending screen
 
-main_characterx2 = 60
-main_charactery2 = 250
-
-score = 0
-times_clicked = 0
+main_characterx2 = 60 #create a variable that tracks where the main character is on the x-axis of the screen in the playing screen
+main_charactery2 = 250#create a variable that tracks where the main character is on the y-axis of the screen in the playing screen
 
 
-
-up_speed = 5
-down_speed = 3
-
-moveup = None
-
-skyscraper_xpos = 650
-skyscraper_ypos = 0
-
-skyscraper2_xpos = 650
-skyscraper2_ypos = 250
-
-skyscraper3_xpos = 650
-skyscraper3_ypos = 0
-
-skyscraper4_xpos = 650
-skyscraper4_ypos = 480
-
-skyscraper5_xpos = 650
-skyscraper5_ypos = 0
-
-skyscraper6_xpos = 650
-skyscraper6_ypos = 400
+score = 0 #tracks the score; increments by one each time the olayer goes past a pole
+times_clicked = 0 #tracks the amount of time the player has clicked. We use this so when the player clicks to play the game, it doesn't automatically move the player, it waits till they click again for movement.
 
 
+
+up_speed = 5 #the amount of pixels the character moves up each time they click space
+down_speed = 3 #gravity speed
+
+moveup = None #variable that tracks if player wants to move up. Turns true if the user clicks or presses space
+
+skyscraper_xpos = 650 #x position for first skyscraper image
+skyscraper_ypos = 0 #y position for first skyscraper image
+
+skyscraper2_xpos = 650  #x position for second skyscraper image
+skyscraper2_ypos = 250 #y position for second skyscraper image
+
+skyscraper3_xpos = 650 #x position for third skyscraper image
+skyscraper3_ypos = 0#y position for third skyscraper image
+
+skyscraper4_xpos = 650 #x position for fourth skyscraper image
+skyscraper4_ypos = 480#y position for fourth skyscraper image
+
+skyscraper5_xpos = 650 #x position for fifth skyscraper image
+skyscraper5_ypos = 0#y position for fifth skyscraper image
+
+skyscraper6_xpos = 650 #x position for sixth skyscraper image
+skyscraper6_ypos = 400#y position for sixth skyscraper image
+
+
+#create variables for all of the colours needed
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 SKY_BLUE = (3, 252, 252)
 BLACK = (0, 0, 0)
 
-playing = False
+#create variable that tracks the main while loop
 done = False
 
-font = pygame.font.Font("FlappybirdyRegular-KaBW.ttf", 100)
+font = pygame.font.Font("FlappybirdyRegular-KaBW.ttf", 100)#generate the custom font that will be used throughout the game
 
 
-background = pygame.image.load("background.jpg")
-background = pygame.transform.scale(background, [400, 600])
+background = pygame.image.load("background.jpg") #load image that will be used as background
+background = pygame.transform.scale(background, [400, 600]) #change the size of the background
 
-intro_text = pygame.image.load("Screen Shot 2023-06-04 at 11.02.54 AM.png")
-intro_text = pygame.transform.scale(intro_text, [400, 400])
+intro_text = pygame.image.load("Screen Shot 2023-06-04 at 11.02.54 AM.png")#load image that will be used as intro text
+intro_text = pygame.transform.scale(intro_text, [400, 400])#change the size of the image
 
-skyscraper = pygame.image.load("building2.png")
-skyscraper = pygame.transform.scale(skyscraper, [100, 100])
-skyscraper2 = pygame.image.load("building2.png")
-skyscraper2 = pygame.transform.scale(skyscraper2, [100, 350])
+skyscraper = pygame.image.load("building2.png") #load image that will be used as one of the poles
+skyscraper = pygame.transform.scale(skyscraper, [100, 100]) #change the size of the image
+skyscraper2 = pygame.image.load("building2.png")#load image that will be used as one of the poles
+skyscraper2 = pygame.transform.scale(skyscraper2, [100, 350])#change the size of the image
 
-skyscraper3 = pygame.image.load("building2.png")
-skyscraper3 = pygame.transform.scale(skyscraper3, [100, 370])
-skyscraper4 = pygame.image.load("building.png")
-skyscraper4 = pygame.transform.scale(skyscraper4, [100, 120])
+skyscraper3 = pygame.image.load("building2.png")#load image that will be used as one of the poles
+skyscraper3 = pygame.transform.scale(skyscraper3, [100, 370])#change the size of the image
+skyscraper4 = pygame.image.load("building.png")#load image that will be used as one of the poles
+skyscraper4 = pygame.transform.scale(skyscraper4, [100, 120])#change the size of the image
 
-skyscraper5 = pygame.image.load("building2.png")
-skyscraper5 = pygame.transform.scale(skyscraper5, [100, 230])
-skyscraper6 = pygame.image.load("building2.png")
-skyscraper6 = pygame.transform.scale(skyscraper6, [100, 230])
+skyscraper5 = pygame.image.load("building2.png")#load image that will be used as one of the poles
+skyscraper5 = pygame.transform.scale(skyscraper5, [100, 230])#change the size of the image
+skyscraper6 = pygame.image.load("building2.png")#load image that will be used as one of the poles
+skyscraper6 = pygame.transform.scale(skyscraper6, [100, 230])#change the size of the image
 
 skyscraper_list = [[skyscraper], [skyscraper2],
                    [skyscraper3], [skyscraper4],
-                   [skyscraper5], [skyscraper6]]
+                   [skyscraper5], [skyscraper6]] #create a list for all of the different pairs of skyscrapers - this will be used for randomization
 
-sidewalk = pygame.image.load("Sidewalk.jpg")
-sidewalk = pygame.transform.scale(sidewalk, [600, 100])
+sidewalk = pygame.image.load("Sidewalk.jpg") #load image for sidewalk
+sidewalk = pygame.transform.scale(sidewalk, [600, 100]) #change size of image
 
-sidewalk_x = 0
-sidewalk_x2 = sidewalk.get_width()
+sidewalk_x = 0#create variable that tracks x position of sidewalk
+sidewalk_x2 = sidewalk.get_width() #create variable that tracks x-position of second sidewalk image; this image will be following the first one to create an "infinite" effect
 
-clock = pygame.time.Clock()
+clock = pygame.time.Clock() #used for tracking fps
 
 
-def infinite_sidewalk():
-    screen.blit(sidewalk, [sidewalk_x, 500])
+def infinite_sidewalk(): #create a function for the infinite sidewalk effect (saves me lines of code)
+    screen.blit(sidewalk, [sidewalk_x, 500]) 
     screen.blit(sidewalk, [sidewalk_x2, 500])
 
 
+def random_poles(): #create function that will repeat the randomization of poles saving lines of code in the future
+    
 
-while not done:
-    if game_state == "intro":
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                done = True
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                times_clicked += 1
-                game_state = "playing"
+
+while not done: #create main while loop to do everything
+    if game_state == "intro": #check what the game state is
+        #must mean game state is intro
+        for event in pygame.event.get(): #check for every event occuring in the pygame window
+            if event.type == pygame.QUIT: #check if they want to close the window
+                done = True #stop the game
+            if event.type == pygame.MOUSEBUTTONDOWN:#check if they clicked the screen
+                times_clicked += 1 #increment times clicked by one
+                game_state = "playing" #change game state as they now want to play
         main_character = pygame.image.load("jetpackman.png")
         main_character = pygame.transform.scale(main_character, [150, 175])
         main_characterx1 = 120
