@@ -24,23 +24,8 @@ down_speed = 3 #gravity speed
 
 moveup = None #variable that tracks if player wants to move up. Turns true if the user clicks or presses space
 
-skyscraper_xpos = 650 #x position for first skyscraper image
-skyscraper_ypos = 0 #y position for first skyscraper image
+number_of_poles = 0
 
-skyscraper2_xpos = 650  #x position for second skyscraper image
-skyscraper2_ypos = 250 #y position for second skyscraper image
-
-skyscraper3_xpos = 650 #x position for third skyscraper image
-skyscraper3_ypos = 0#y position for third skyscraper image
-
-skyscraper4_xpos = 650 #x position for fourth skyscraper image
-skyscraper4_ypos = 480#y position for fourth skyscraper image
-
-skyscraper5_xpos = 650 #x position for fifth skyscraper image
-skyscraper5_ypos = 0#y position for fifth skyscraper image
-
-skyscraper6_xpos = 650 #x position for sixth skyscraper image
-skyscraper6_ypos = 400#y position for sixth skyscraper image
 
 
 #create variables for all of the colours needed
@@ -84,7 +69,7 @@ sidewalk = pygame.image.load("Sidewalk.jpg") #load image for sidewalk
 sidewalk = pygame.transform.scale(sidewalk, [600, 100]) #change size of image
 
 sidewalk_x = 0#create variable that tracks x position of sidewalk
-sidewalk_x2 = sidewalk.get_width() #create variable that tracks x-position of second sidewalk image; this image will be following the first one to create an "infinite" effect
+sidewalk_x2 = 600 #create variable that tracks x-position of second sidewalk image; this image will be following the first one to create an "infinite" effect
 
 clock = pygame.time.Clock() #used for tracking fps
 
@@ -93,9 +78,60 @@ def infinite_sidewalk(): #create a function for the infinite sidewalk effect (sa
     screen.blit(sidewalk, [sidewalk_x, 500]) 
     screen.blit(sidewalk, [sidewalk_x2, 500])
 
+skyscraper_xpos = 650 #x position for first skyscraper image
+skyscraper_ypos = 0 #y position for first skyscraper image
+skyscraper2_xpos = 650  #x position for second skyscraper image
+skyscraper2_ypos = 250 #y position for second skyscraper image
 
 def random_poles(): #create function that will repeat the randomization of poles saving lines of code in the future
-    
+    global skyscraper_xpos
+    global skyscraper_ypos
+    global skyscraper2_xpos
+    global skyscraper2_ypos
+    global number_of_poles
+    random_number = random.randrange(1, 4)
+    if random_number == 1:
+        if number_of_poles == 0:
+            screen.blit(skyscraper, [skyscraper_xpos, skyscraper_ypos])
+            screen.blit(skyscraper2, [skyscraper2_xpos, skyscraper2_ypos])
+            skyscraper_xpos -= 2
+            skyscraper2_xpos -= 2
+        else:
+            if skyscraper_xpos and skyscraper2_xpos < 50:
+                screen.blit(skyscraper, [skyscraper_xpos, skyscraper_ypos])
+                screen.blit(skyscraper2, [skyscraper2_xpos, skyscraper2_ypos])
+                skyscraper_xpos -= 2
+                skyscraper2_xpos -= 2
+
+        number_of_poles += 1
+    elif random_number == 2:
+        if number_of_poles == 0:
+            screen.blit(skyscraper3, [skyscraper_xpos, skyscraper_ypos])
+            screen.blit(skyscraper4, [skyscraper2_xpos, skyscraper2_ypos])
+            skyscraper_xpos -= 2
+            skyscraper2_xpos -= 2
+        else:
+            if skyscraper_xpos and skyscraper2_xpos < 50:
+                screen.blit(skyscraper3, [skyscraper_xpos, skyscraper_ypos])
+                screen.blit(skyscraper4, [skyscraper2_xpos, skyscraper2_ypos])
+                skyscraper_xpos -= 2
+                skyscraper2_xpos -= 2
+
+        number_of_poles += 1
+    elif random_number == 3:
+        if number_of_poles == 0:
+            screen.blit(skyscraper5, [skyscraper_xpos, skyscraper_ypos])
+            screen.blit(skyscraper6, [skyscraper2_xpos, skyscraper2_ypos])
+            skyscraper_xpos -= 2
+            skyscraper2_xpos -= 2
+        else:
+            if skyscraper_xpos and skyscraper2_xpos < 50:
+                screen.blit(skyscraper5, [skyscraper_xpos, skyscraper_ypos])
+                screen.blit(skyscraper6, [skyscraper2_xpos, skyscraper2_ypos])
+                skyscraper_xpos -= 2
+                skyscraper2_xpos -= 2
+
+        number_of_poles += 1
 
 
 while not done: #create main while loop to do everything
@@ -178,7 +214,7 @@ while not done: #create main while loop to do everything
         font2 = pygame.font.SysFont("Calibri", 50, False, False)
         score_text = font2.render(str(score), True, WHITE)
         screen.blit(score_text, [185, 100])
-
+        random_poles()
         pygame.display.flip()
 
     if game_state == "ending" :
