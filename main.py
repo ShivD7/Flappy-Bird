@@ -18,13 +18,13 @@ score = 0 #tracks the score; increments by one each time the olayer goes past a 
 times_clicked = 0 #tracks the amount of time the player has clicked. We use this so when the player clicks to play the game, it doesn't automatically move the player, it waits till they click again for movement.
 
 
-
-up_speed = 5 #the amount of pixels the character moves up each time they click space
-down_speed = 3 #gravity speed
+up_speed = 8 #the amount of pixels the character moves up each time they click space
+down_speed = 5 #gravity speed
 
 moveup = None #variable that tracks if player wants to move up. Turns true if the user clicks or presses space
 
-number_of_poles = 0
+pipe_frequency = 1500
+last_pipe = pygame.time.get_ticks()
 
 
 
@@ -51,19 +51,7 @@ skyscraper = pygame.transform.scale(skyscraper, [100, 100]) #change the size of 
 skyscraper2 = pygame.image.load("building2.png")#load image that will be used as one of the poles
 skyscraper2 = pygame.transform.scale(skyscraper2, [100, 350])#change the size of the image
 
-skyscraper3 = pygame.image.load("building2.png")#load image that will be used as one of the poles
-skyscraper3 = pygame.transform.scale(skyscraper3, [100, 370])#change the size of the image
-skyscraper4 = pygame.image.load("building.png")#load image that will be used as one of the poles
-skyscraper4 = pygame.transform.scale(skyscraper4, [100, 120])#change the size of the image
 
-skyscraper5 = pygame.image.load("building2.png")#load image that will be used as one of the poles
-skyscraper5 = pygame.transform.scale(skyscraper5, [100, 230])#change the size of the image
-skyscraper6 = pygame.image.load("building2.png")#load image that will be used as one of the poles
-skyscraper6 = pygame.transform.scale(skyscraper6, [100, 230])#change the size of the image
-
-skyscraper_list = [[skyscraper], [skyscraper2],
-                   [skyscraper3], [skyscraper4],
-                   [skyscraper5], [skyscraper6]] #create a list for all of the different pairs of skyscrapers - this will be used for randomization
 
 sidewalk = pygame.image.load("Sidewalk.jpg") #load image for sidewalk
 sidewalk = pygame.transform.scale(sidewalk, [600, 100]) #change size of image
@@ -83,55 +71,49 @@ skyscraper_ypos = 0 #y position for first skyscraper image
 skyscraper2_xpos = 650  #x position for second skyscraper image
 skyscraper2_ypos = 250 #y position for second skyscraper image
 
-def random_poles(): #create function that will repeat the randomization of poles saving lines of code in the future
-    global skyscraper_xpos
-    global skyscraper_ypos
-    global skyscraper2_xpos
-    global skyscraper2_ypos
-    global number_of_poles
-    random_number = random.randrange(1, 4)
-    if random_number == 1:
-        if number_of_poles == 0:
-            screen.blit(skyscraper, [skyscraper_xpos, skyscraper_ypos])
-            screen.blit(skyscraper2, [skyscraper2_xpos, skyscraper2_ypos])
-            skyscraper_xpos -= 2
-            skyscraper2_xpos -= 2
-        else:
-            if skyscraper_xpos and skyscraper2_xpos < 50:
-                screen.blit(skyscraper, [skyscraper_xpos, skyscraper_ypos])
-                screen.blit(skyscraper2, [skyscraper2_xpos, skyscraper2_ypos])
-                skyscraper_xpos -= 2
-                skyscraper2_xpos -= 2
 
-        number_of_poles += 1
-    elif random_number == 2:
-        if number_of_poles == 0:
-            screen.blit(skyscraper3, [skyscraper_xpos, skyscraper_ypos])
-            screen.blit(skyscraper4, [skyscraper2_xpos, skyscraper2_ypos])
-            skyscraper_xpos -= 2
-            skyscraper2_xpos -= 2
-        else:
-            if skyscraper_xpos and skyscraper2_xpos < 50:
-                screen.blit(skyscraper3, [skyscraper_xpos, skyscraper_ypos])
-                screen.blit(skyscraper4, [skyscraper2_xpos, skyscraper2_ypos])
-                skyscraper_xpos -= 2
-                skyscraper2_xpos -= 2
+drawing_poles = False
+pole_pair_status = False
+    
 
-        number_of_poles += 1
-    elif random_number == 3:
-        if number_of_poles == 0:
-            screen.blit(skyscraper5, [skyscraper_xpos, skyscraper_ypos])
-            screen.blit(skyscraper6, [skyscraper2_xpos, skyscraper2_ypos])
-            skyscraper_xpos -= 2
-            skyscraper2_xpos -= 2
-        else:
-            if skyscraper_xpos and skyscraper2_xpos < 50:
-                screen.blit(skyscraper5, [skyscraper_xpos, skyscraper_ypos])
-                screen.blit(skyscraper6, [skyscraper2_xpos, skyscraper2_ypos])
-                skyscraper_xpos -= 2
-                skyscraper2_xpos -= 2
+#building pipes
+pipe_surface = 	pygame.image.load("building2.png") #load image that will be used as one of the poles
+pipe_surface = pygame.transform.scale(pipe_surface, [100, 400]) #change the size of the image
+pipe_list = [] #create a list for all of the different pairs of skyscrapers - this will be used for randomization
+SPAWNPIPE = pygame.USEREVENT
+pygame.time.set_timer(SPAWNPIPE , 1300)
+pipe_height = [550, 180, 250, 500, 370, 300, 430]
 
-        number_of_poles += 1
+
+
+
+def create_pipe():
+    random_pipe_pos = random.choice(pipe_height)
+    top_pipe = pipe_surface.get_rect(midbottom = (700, random_pipe_pos - 150))
+    bottom_pipe = pipe_surface.get_rect(midtop = (700, random_pipe_pos))
+    return bottom_pipe, top_pipe
+
+def move_pipes(pipes):
+    for pipe in pipes:
+        pipe.centerx -= 5
+    
+    return pipes
+
+def draw_pipes(pipes):
+    for pipe in pipes:
+        if pipe.bottom >= 600:
+            screen.blit(pipe_surface, pipe)
+        else:
+            flip_pipe = pygame.transform.flip(pipe_surface, False, True)
+            screen.blit(flip_pipe, pipe)
+
+
+def check_collsion(pipes):
+    global main_character_rect
+    global game_state
+    for pipe in pipes:
+        if main_character_rect.colliderect(pipe):
+            print(game_state)
 
 
 while not done: #create main while loop to do everything
@@ -147,14 +129,14 @@ while not done: #create main while loop to do everything
         main_character = pygame.transform.scale(main_character, [150, 175])
         main_characterx1 = 120
         main_charactery1 = 280
+
         screen.blit(background, [0, 0])
         screen.blit(intro_text, [1, 200])
         screen.blit(main_character, [main_characterx1, main_charactery1])
-        pygame.display.flip()
     if game_state == "playing":
-        drawing_poles = True
         main_character = pygame.image.load("jetpackman.png")
         main_character = pygame.transform.scale(main_character, [75, 75]) 
+        main_character_rect = main_character.get_rect(center = (37.5, 37.5))
         screen.blit(background, [0, 0])
         sidewalk_x -= 2
         sidewalk_x2 -= 2 
@@ -168,6 +150,7 @@ while not done: #create main while loop to do everything
                     done = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     times_clicked += 1
+                    main_character_rect.center = (37.5, 37.5)
                     if times_clicked != 1:
                         moveup = True
                     else:
@@ -179,6 +162,7 @@ while not done: #create main while loop to do everything
                         moveup = None
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        main_character_rect.center = (37.5, 37.5)
                         times_clicked += 1
                         if times_clicked != 1:
                             moveup = True
@@ -186,6 +170,7 @@ while not done: #create main while loop to do everything
                             moveup = None
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
+                        main_character_rect.center = (37.5, 37.5)
                         times_clicked += 1
                         if times_clicked != 1:
                             moveup = True
@@ -198,14 +183,17 @@ while not done: #create main while loop to do everything
                             moveup = False
                         else:
                             moveup = None
+                if event.type == SPAWNPIPE:
+                    pipe_list.extend(create_pipe())
         
 
         if moveup == True:
             main_charactery2 -= up_speed
+            main_character_rect.centery -= up_speed
         if moveup == False: 
             main_charactery2 += down_speed
+            main_character_rect.centery += down_speed
             if main_charactery2 + 273 >= 800:
-                drawing_poles = False
                 game_state = "ending"      
         if moveup == None:
             main_charactery2 == main_charactery2
@@ -214,9 +202,17 @@ while not done: #create main while loop to do everything
         font2 = pygame.font.SysFont("Calibri", 50, False, False)
         score_text = font2.render(str(score), True, WHITE)
         screen.blit(score_text, [185, 100])
-        random_poles()
-        pygame.display.flip()
 
+        #moving pipes
+        pipe_list = move_pipes(pipe_list)
+        draw_pipes(pipe_list)
+        check_collsion(pipe_list)
+        
+        
+        
+        
+
+        # Check if poles have moved off the screen
     if game_state == "ending" :
         font = pygame.font.Font("FlappybirdyRegular-KaBW.ttf", 100)
         font2 = pygame.font.SysFont("Calibri", 50, False, False)
@@ -229,8 +225,9 @@ while not done: #create main while loop to do everything
         screen.blit(score_text, [178, 325])
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                done = True    
-        pygame.display.flip()
-        clock.tick(60)
+                done = True
+    pygame.display.flip()   
+    clock.tick(60)
+
 
 pygame.quit()
