@@ -110,17 +110,14 @@ def draw_pipes(pipes):
             flip_pipe = pygame.transform.flip(pipe_surface, False, True)
             screen.blit(flip_pipe, pipe)
 
+game_state_change = False
 
 def check_collsion(pipes):
-    global collided
     global main_character_rect
     global game_state
     for pipe in pipes:
         if main_character_rect.colliderect(pipe):
-            collided = True
-        else:
-            collided = False
-    return collided
+            game_state = "ending"
 
 
 while not done: #create main while loop to do everything
@@ -143,7 +140,7 @@ while not done: #create main while loop to do everything
     if game_state == "playing":
         main_character = pygame.image.load("jetpackman.png")
         main_character = pygame.transform.scale(main_character, [75, 75]) 
-        main_character_rect = main_character.get_rect(center = (37.5, 37.5))
+        main_character_rect = main_character.get_rect(topleft = (main_characterx2 - 29, main_charactery2 + 10))
         screen.blit(background, [0, 0])
         sidewalk_x -= 2
         sidewalk_x2 -= 2 
@@ -157,7 +154,7 @@ while not done: #create main while loop to do everything
                     done = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     times_clicked += 1
-                    main_character_rect.center = (37.5, 37.5)
+                    main_character_rect.topleft = (main_characterx2 - 29, main_charactery2 + 10)
                     if times_clicked != 1:
                         moveup = True
                     else:
@@ -169,7 +166,7 @@ while not done: #create main while loop to do everything
                         moveup = None
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        main_character_rect.center = (37.5, 37.5)
+                        main_character_rect.topleft = (main_characterx2 - 29, main_charactery2 + 10)
                         times_clicked += 1
                         if times_clicked != 1:
                             moveup = True
@@ -177,7 +174,7 @@ while not done: #create main while loop to do everything
                             moveup = None
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        main_character_rect.center = (37.5, 37.5)
+                        main_character_rect.topleft = (main_characterx2 - 29, main_charactery2 + 10)
                         times_clicked += 1
                         if times_clicked != 1:
                             moveup = True
@@ -197,10 +194,8 @@ while not done: #create main while loop to do everything
 
         if moveup == True:
             main_charactery2 -= up_speed
-            main_character_rect.centery -= up_speed
         if moveup == False: 
             main_charactery2 += down_speed
-            main_character_rect.centery += down_speed
             if main_charactery2 + 273 >= 800:
                 game_state = "ending"      
         if moveup == None:
@@ -216,14 +211,13 @@ while not done: #create main while loop to do everything
         pipe_list = move_pipes(pipe_list)
         draw_pipes(pipe_list)
         check_collsion(pipe_list)
-        if collided == True:
-            game_state = "ending"
         
         
         
 
         # Check if poles have moved off the screen
     if game_state == "ending" :
+        main_characterx2 = 0
         font = pygame.font.Font("FlappybirdyRegular-KaBW.ttf", 100)
         font2 = pygame.font.SysFont("Calibri", 50, False, False)
         losing_text = font.render("YOU DIED", True, WHITE)
@@ -233,9 +227,22 @@ while not done: #create main while loop to do everything
         screen.blit(losing_text, [80, 100])
         screen.blit(score_text2, [120, 250])
         screen.blit(score_text, [178, 325])
+        pygame.draw.rect(screen, WHITE, [65, 390, 275, 100], 4)
+        pos = pygame.mouse.get_pos()
+        mouse_xpos = pos[0]
+        mouse_ypos = pos[1]
+        if mouse_xpos > 65 and mouse_xpos < 340 and mouse_ypos > 390 and mouse_ypos < 490:
+                pygame.draw.rect(screen, SKY_BLUE, [65, 390, 275, 100])
+        restart_text = font.render("RESTART", True, WHITE)
+        screen.blit(restart_text, [105, 410])
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if mouse_xpos > 65 and mouse_xpos < 340 and mouse_ypos > 390 and mouse_ypos < 490:
+                    game_state_change = True
+        print(game_state_change)
+        print(game_state)
     pygame.display.flip()   
     clock.tick(60)
 
