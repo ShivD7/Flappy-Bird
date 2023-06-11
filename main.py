@@ -94,8 +94,11 @@ def create_pipe():
     return bottom_pipe, top_pipe
 
 def move_pipes(pipes):
+    global score
     for pipe in pipes:
         pipe.centerx -= 5
+        if pipe.centerx == main_characterx2:
+            score += 0.5
     
     return pipes
 
@@ -109,11 +112,15 @@ def draw_pipes(pipes):
 
 
 def check_collsion(pipes):
+    global collided
     global main_character_rect
     global game_state
     for pipe in pipes:
         if main_character_rect.colliderect(pipe):
-            print(game_state)
+            collided = True
+        else:
+            collided = False
+    return collided
 
 
 while not done: #create main while loop to do everything
@@ -185,6 +192,7 @@ while not done: #create main while loop to do everything
                             moveup = None
                 if event.type == SPAWNPIPE:
                     pipe_list.extend(create_pipe())
+                    
         
 
         if moveup == True:
@@ -200,6 +208,7 @@ while not done: #create main while loop to do everything
 
         screen.blit(main_character, [main_characterx2, main_charactery2])
         font2 = pygame.font.SysFont("Calibri", 50, False, False)
+        score = int(score)
         score_text = font2.render(str(score), True, WHITE)
         screen.blit(score_text, [185, 100])
 
@@ -207,7 +216,8 @@ while not done: #create main while loop to do everything
         pipe_list = move_pipes(pipe_list)
         draw_pipes(pipe_list)
         check_collsion(pipe_list)
-        
+        if collided == True:
+            game_state = "ending"
         
         
         
