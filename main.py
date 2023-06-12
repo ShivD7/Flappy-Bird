@@ -185,7 +185,7 @@ while not done: #create main while loop to do everything
             pipe_height = [550, 180, 250, 500, 370, 300, 430]
         main_character = pygame.image.load("jetpackman.png")
         main_character = pygame.transform.scale(main_character, [50, 50]) 
-        main_character_rect = main_character.get_rect(topleft = (main_characterx2 - 29, main_charactery2 + 10))
+        main_character_rect = main_character.get_rect(topleft = (main_characterx2 - 15, main_charactery2 + 4))
         screen.blit(background, [0, 0])
         sidewalk_x -= 2
         sidewalk_x2 -= 2 
@@ -199,7 +199,7 @@ while not done: #create main while loop to do everything
                     done = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     times_clicked += 1
-                    main_character_rect.topleft = (main_characterx2 - 29, main_charactery2 + 10)
+                    main_character_rect.topleft = (main_characterx2 - 15, main_charactery2 + 4)
                     if times_clicked != 1:
                         moveup = True
                     else:
@@ -211,7 +211,7 @@ while not done: #create main while loop to do everything
                         moveup = None
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        main_character_rect.topleft = (main_characterx2 - 29, main_charactery2 + 10)
+                        main_character_rect.topleft = (main_characterx2 - 15, main_charactery2 + 4)
                         times_clicked += 1
                         if times_clicked != 1:
                             moveup = True
@@ -219,7 +219,7 @@ while not done: #create main while loop to do everything
                             moveup = None
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        main_character_rect.topleft = (main_characterx2 - 29, main_charactery2 + 10)
+                        main_character_rect.topleft = (main_characterx2 - 15, main_charactery2 + 4)
                         times_clicked += 1
                         if times_clicked != 1:
                             moveup = True
