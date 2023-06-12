@@ -18,8 +18,8 @@ score = 0 #tracks the score; increments by one each time the olayer goes past a 
 times_clicked = 0 #tracks the amount of time the player has clicked. We use this so when the player clicks to play the game, it doesn't automatically move the player, it waits till they click again for movement.
 
 
-up_speed = 8 #the amount of pixels the character moves up each time they click space
-down_speed = 5 #gravity speed
+up_speed = 5.5 #the amount of pixels the character moves up each time they click space
+down_speed = 3.5 #gravity speed
 
 moveup = None #variable that tracks if player wants to move up. Turns true if the user clicks or presses space
 
@@ -118,10 +118,13 @@ def check_collsion(pipes):
     for pipe in pipes:
         if main_character_rect.colliderect(pipe):
             game_state = "ending"
+            
 
+restart = False
 
 while not done: #create main while loop to do everything
     if game_state == "intro": #check what the game state is
+        game_state = "intro"
         #must mean game state is intro
         for event in pygame.event.get(): #check for every event occuring in the pygame window
             if event.type == pygame.QUIT: #check if they want to close the window
@@ -137,9 +140,51 @@ while not done: #create main while loop to do everything
         screen.blit(background, [0, 0])
         screen.blit(intro_text, [1, 200])
         screen.blit(main_character, [main_characterx1, main_charactery1])
+    if game_state == "ending":
+        main_characterx2 = 0
+        font = pygame.font.Font("FlappybirdyRegular-KaBW.ttf", 100)
+        font2 = pygame.font.SysFont("Calibri", 50, False, False)
+        losing_text = font.render("YOU DIED", True, WHITE)
+        score_text = font2.render(str(score), True, WHITE)
+        score_text2 = font.render("SCORE", True, WHITE)
+        screen.fill(BLACK)
+        screen.blit(losing_text, [80, 100])
+        screen.blit(score_text2, [120, 250])
+        screen.blit(score_text, [178, 325])
+        pygame.draw.rect(screen, WHITE, [65, 390, 275, 100], 4)
+        pos = pygame.mouse.get_pos()
+        mouse_xpos = pos[0]
+        mouse_ypos = pos[1]
+        if mouse_xpos > 65 and mouse_xpos < 340 and mouse_ypos > 390 and mouse_ypos < 490:
+                pygame.draw.rect(screen, SKY_BLUE, [65, 390, 275, 100])
+        restart_text = font.render("RESTART", True, WHITE)
+        screen.blit(restart_text, [105, 410])
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                mouse_xpos = pos[0]
+                mouse_ypos = pos[1]
+                if mouse_xpos > 65 and mouse_xpos < 340 and mouse_ypos > 390 and mouse_ypos < 490:
+                    restart = True
+                    game_state = "intro"
     if game_state == "playing":
+        if restart:
+            moveup = None
+            times_clicked = 0
+            times_clicked += 1
+            score = 0
+            main_characterx2 = 60
+            main_charactery2 = 250
+            pipe_surface = 	pygame.image.load("building2.png") #load image that will be used as one of the poles
+            pipe_surface = pygame.transform.scale(pipe_surface, [100, 400]) #change the size of the image
+            pipe_list = [] #create a list for all of the different pairs of skyscrapers - this will be used for randomization
+            SPAWNPIPE = pygame.USEREVENT
+            pygame.time.set_timer(SPAWNPIPE , 1300)
+            pipe_height = [550, 180, 250, 500, 370, 300, 430]
         main_character = pygame.image.load("jetpackman.png")
-        main_character = pygame.transform.scale(main_character, [75, 75]) 
+        main_character = pygame.transform.scale(main_character, [50, 50]) 
         main_character_rect = main_character.get_rect(topleft = (main_characterx2 - 29, main_charactery2 + 10))
         screen.blit(background, [0, 0])
         sidewalk_x -= 2
@@ -181,7 +226,6 @@ while not done: #create main while loop to do everything
                         else:
                             moveup = None
                 if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
                         times_clicked += 1
                         if times_clicked != 1:
                             moveup = False
@@ -189,11 +233,14 @@ while not done: #create main while loop to do everything
                             moveup = None
                 if event.type == SPAWNPIPE:
                     pipe_list.extend(create_pipe())
-                    
+        restart = False          
         
 
         if moveup == True:
-            main_charactery2 -= up_speed
+            if main_charactery2  + 20 >= 0:
+                main_charactery2 -= up_speed
+            else:
+                main_charactery2 -= 0
         if moveup == False: 
             main_charactery2 += down_speed
             if main_charactery2 + 273 >= 800:
@@ -216,33 +263,6 @@ while not done: #create main while loop to do everything
         
 
         # Check if poles have moved off the screen
-    if game_state == "ending" :
-        main_characterx2 = 0
-        font = pygame.font.Font("FlappybirdyRegular-KaBW.ttf", 100)
-        font2 = pygame.font.SysFont("Calibri", 50, False, False)
-        losing_text = font.render("YOU DIED", True, WHITE)
-        score_text = font2.render(str(score), True, WHITE)
-        score_text2 = font.render("SCORE", True, WHITE)
-        screen.fill(BLACK)
-        screen.blit(losing_text, [80, 100])
-        screen.blit(score_text2, [120, 250])
-        screen.blit(score_text, [178, 325])
-        pygame.draw.rect(screen, WHITE, [65, 390, 275, 100], 4)
-        pos = pygame.mouse.get_pos()
-        mouse_xpos = pos[0]
-        mouse_ypos = pos[1]
-        if mouse_xpos > 65 and mouse_xpos < 340 and mouse_ypos > 390 and mouse_ypos < 490:
-                pygame.draw.rect(screen, SKY_BLUE, [65, 390, 275, 100])
-        restart_text = font.render("RESTART", True, WHITE)
-        screen.blit(restart_text, [105, 410])
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                done = True
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if mouse_xpos > 65 and mouse_xpos < 340 and mouse_ypos > 390 and mouse_ypos < 490:
-                    game_state_change = True
-        print(game_state_change)
-        print(game_state)
     pygame.display.flip()   
     clock.tick(60)
 
